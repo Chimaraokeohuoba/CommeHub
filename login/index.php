@@ -7,7 +7,7 @@ $errorMsg = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     $email;
     $password;
-    $baseData = new Database('thehub');
+    $baseData = new Database(database);
 
     if (isset($_POST['email_field']) && !empty($_POST['email_field'])){
         $email = $baseData->parseInput($_POST['email_field']);
@@ -25,10 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                     #password matches!
                     session_start();
                     $_SESSION['logged'] = TRUE;
-                    $_SESSION['username'] = $baseData->getRecord(USERS,USERNAME,EMAIL,$email);
+                    $_SESSION['user'] = $baseData->getRecord(USERS,USERNAME,EMAIL,$email);
                     $_SESSION['photo'] = $baseData->getRecord(USERS,PHOTO,EMAIL,$email);
                     $_SESSION['email'] = $email;
-                    header("Location:../dashboard.php");
+                    header("Location:../pingle/home.php");
                 }else {
                     $errorMsg = 'Password incorrect!';
                 }
@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 
         <div class="container jumbotron edge" style="background-color:rgba(255,255,255,1);border-radius:10px;">
           <h1>Login</h1>
-          <p><h3>Don't have account yet? <a href="../signup">Sign up!</a></h3></p>
+          <p><h5>Don't have account yet? <a href="../signup">Sign up!</a></h5></p>
 
 
         </div>

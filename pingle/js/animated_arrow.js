@@ -33,5 +33,9 @@ function genesis(){
     third(first_count,third_count,arr[i]);
   }
 }
+//alert('hello');
+$(document).ready(function(){
+  genesis();
+})
+//genesis();
 
-genesis();

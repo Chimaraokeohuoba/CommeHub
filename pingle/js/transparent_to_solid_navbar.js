@@ -1,27 +1,28 @@
-// $(window).on('load', function(){
-//   if($(window).width()<=786){
-//     $("#big_search").addClass("hidden");
-//     $("#small_search").removeClass("hidden");
-//   }else{
-//     $("#big_search").removeClass("hidden");
-//     $("#small_search").addClass("hidden");
-//
-//   }
-//
-//     })
-//
-// $(window).on("resize", function(){
-//   if($(window).width()<=786){
-//     console.log($(window).width());
-//     $("#big_search").addClass("hidden");
-//     $("#small_search").removeClass("hidden");
-//   }else{
-//     $("#big_search").removeClass("hidden");
-//     $("#small_search").addClass("hidden");
-//
-//   }
-//
-//     })
+//alert("hello");
+$(window).on('load', function(){
+  if($(window).width()<=786){
+    $("#big_nav").addClass("hidden");
+    $("#small_nav").removeClass("hidden");
+  }else{
+    $("#big_nav").removeClass("hidden");
+    $("#small_nav").addClass("hidden");
+
+  }
+
+    })
+
+$(window).on("resize", function(){
+  if($(window).width()<=786){
+    console.log($(window).width());
+    $("#big_nav").addClass("hidden");
+    $("#small_nav").removeClass("hidden");
+  }else{
+    $("#big_nav").removeClass("hidden");
+    $("#small_nav").addClass("hidden");
+
+  }
+
+    })
 //
 
 /**
@@ -29,18 +30,18 @@
  */
 function checkScroll(){
 
-    var startY = $('.navbar#top_nav').height() * 0.1; //The point where the navbar changes in px
+    var startY = $('.navbar.top_nav').height() * 0.1; //The point where the navbar changes in px
 
     if($(window).scrollTop() > startY){
-        $('.navbar#top_nav').addClass("scrolled");
+        $('.navbar.top_nav').addClass("scrolled");
     }else{
         if(($("#bs-example-navbar-collapse-1").is(":visible")) == false){
         console.log("toggle is open")};
-        $('.navbar#top_nav').removeClass("scrolled");
+        $('.navbar.top_nav').removeClass("scrolled");
     }
 }
 
-if($('.navbar#top_nav').length > 0){
+if($('.navbar.top_nav').length > 0){
     $(window).on("scroll load resize", function(){
         checkScroll();
     });
@@ -50,106 +51,135 @@ if($('.navbar#top_nav').length > 0){
 $(".navbar-toggle.collapsed").on("click", function(){
   if(($("#bs-example-navbar-collapse-1").is(":visible")) == false){
   console.log("toggle is open");
-  $('.navbar#top_nav').addClass("scrolled");}else{
+  $('.navbar.top_nav').addClass("scrolled");}else{
     checkScroll();
   };})
 
 
   $(".panel-footer").on("click", function(){
     if(($("#collapseOne").is(":visible")) == false){
-      document.querySelector(".panel-title").textContent = "Click to see less votes";
+      document.querySelector(".panel-title").textContent = "Click to see less Nominations";
     // $('.navbar').addClass("scrolled");
   }else{
-      document.querySelector(".panel-title").textContent = "Click to see more votes"
+      document.querySelector(".panel-title").textContent = "Click to see all featured Nominations"
       // checkScroll();
     };})
 
 
-  $("#about").on("click",function(){
+  $("#home").on("click",function(){
 
-    $(".profile_about").removeClass("hidden");
-    $("#about").addClass("current");
-
-
-    $(".profile_deals").addClass("hidden");
-    $("#deals").removeClass("current");
-
-    $(".profile_talk").addClass("hidden");
-    $("#talk").removeClass("current");
-
-    $(".profile_votes").addClass("hidden");
-    $("#votes").removeClass("current");
-
-  })
-
-  $("#deals").on("click",function(){
-
-    $(".profile_about").addClass("hidden");
-    $("#about").removeClass("current");
+    $(".home").removeClass("hidden");
+    $("#home").addClass("current");
 
 
-    $(".profile_deals").removeClass("hidden");
-    $("#deals").addClass("current");
+    $(".deal_hub").addClass("hidden");
+    $("#deal_hub").removeClass("current");
 
-    $(".profile_talk").addClass("hidden");
-    $("#talk").removeClass("current");
+    $(".talks").addClass("hidden");
+    $("#talks").removeClass("current");
 
-    $(".profile_votes").addClass("hidden");
-    $("#votes").removeClass("current");
-  })
-
-
-  $("#talk").on("click",function(){
-
-    $(".profile_about").addClass("hidden");
-    $("#about").removeClass("current");
-
-
-    $(".profile_deals").addClass("hidden");
-    $("#deals").removeClass("current");
-
-    $(".profile_talk").removeClass("hidden");
-    $("#talk").addClass("current");
-
-    $(".profile_votes").addClass("hidden");
-    $("#votes").removeClass("current");
+    $(".nominations").addClass("hidden");
+    $("#nominations").removeClass("current");
 
   })
 
-  $("#votes").on("click",function(){
+  $("#deal_hub").on("click",function(){
 
-    $(".profile_about").addClass("hidden");
-    $("#about").removeClass("current");
+    $(".home").addClass("hidden");
+    $("#home").removeClass("current");
 
 
-    $(".profile_deals").addClass("hidden");
-    $("#deals").removeClass("current");
+    $(".deal_hub").removeClass("hidden");
+    $("#deal_hub").addClass("current");
 
-    $(".profile_talk").addClass("hidden");
-    $("#talk").removeClass("current");
+    $(".talks").addClass("hidden");
+    $("#talks").removeClass("current");
 
-    $(".profile_votes").removeClass("hidden");
-    $("#votes").addClass("current");
+    $(".nominations").addClass("hidden");
+    $("#nominations").removeClass("current");
+  })
+
+
+  $("#talks").on("click",function(){
+
+    $(".home").addClass("hidden");
+    $("#home").removeClass("current");
+
+
+    $(".deal_hub").addClass("hidden");
+    $("#deal_hub").removeClass("current");
+
+    $(".talks").removeClass("hidden");
+    $("#talks").addClass("current");
+
+    $(".nominations").addClass("hidden");
+    $("#nominations").removeClass("current");
+
+  })
+
+  $("#nominations").on("click",function(){
+
+    $(".home").addClass("hidden");
+    $("#home").removeClass("current");
+
+
+    $(".deal_hub").addClass("hidden");
+    $("#deal_hub").removeClass("current");
+
+    $(".talks").addClass("hidden");
+    $("#talks").removeClass("current");
+
+    $(".nominations").removeClass("hidden");
+    $("#nominations").addClass("current");
 
   })
 
 
   $(window).on('load', function(){
 
-      $(".profile_about").removeClass("hidden");
-      $("#about").addClass("current");
+      $(".home").removeClass("hidden");
+      $("#home").addClass("current");
 
 
-      $(".profile_deals").addClass("hidden");
-      $("#deals").removeClass("current");
+      $(".deal_hub").addClass("hidden");
+      $("#deal_hub").removeClass("current");
 
-      $(".profile_talk").addClass("hidden");
-      $("#talk").removeClass("current");
+      $(".talks").addClass("hidden");
+      $("#talks").removeClass("current");
 
-      $(".profile_votes").addClass("hidden");
-      $("#votes").removeClass("current");
+      $(".nominations").addClass("hidden");
+      $("#nominations").removeClass("current");
 
       })
+
+
+
+/******************************************************************************/
+      /********************privacy policy listener script***************/
+
+      $("#privacy_policy").on("click",function(){
+
+        $(".privacy_policy").removeClass("hidden");
+        $("#privacy_policy").addClass("current");
+
+
+        $(".terms_of_use").addClass("hidden");
+        $("#terms_of_use").removeClass("current");
+      })
+
+
+
+      $("#terms_of_use").on("click",function(){
+
+        $(".terms_of_use").removeClass("hidden");
+        $("#terms_of_use").addClass("current");
+
+
+        $(".privacy_policy").addClass("hidden");
+        $("#privacy_policy").removeClass("current");
+      })
+      /********************privacy policy listener script***************/
+/******************************************************************************/
 
 
 // 786

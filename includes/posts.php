@@ -8,7 +8,7 @@
 
 
     require "includes/datacontrol.php" ;
-    $baseData = new Database("thehub");
+    $baseData = new Database(database);
 
 
     class posts{
@@ -22,6 +22,8 @@
         protected $photo;
         protected $date;
         protected $baseData;
+        protected $active = '';
+        protected $position;
 
         /**
          * @return the $id
@@ -50,54 +52,64 @@
 
         function appendToHTML(){
 
-
+            //echo $this->position;
             $optionHTML = '';
-            foreach ($this->getPostOptions() as $postOptions){
-                $optionHTML = $optionHTML.'<div class="first">
-                      <div>
-                      <div class="poll_card__product_name"><strong class="poll_card__option_position">'.$postOptions->getPositionString().'</strong><h5 class="poll_card__vote_count"><strong class="poll_card__vote_count_number_first">'.$postOptions->getVotes().'</strong> votes</h5></div>
-                      </div>
-                      <div class="poll_card__product_name">'.$postOptions->getName().'</div>
-                      <div class="wd_spacerSize--5 d_spacerSize--5 wt_spacerSize--5 nt_spacerSize--5 p_spacerSize--5"></div>
-                      <div class="progress" style="height: 10px;">
-                        <div class="progress-bar progress-bar-success '.$postOptions->getPriorityString().'" id = "first_vote" role="progressbar" style="width:" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                      </div>
-                    </div>';
+            if($this->getPostOptions() != null){
+                foreach ($this->getPostOptions() as $postOptions){
+                    $optionHTML = $optionHTML.'<div class="'.$postOptions->getPriorityString().'">
+                          <div>
+                          <div class="poll_card__product_name"><strong class="poll_card__option_position">'.$postOptions->getPositionString().'</strong><h5 class="poll_card__vote_count"><strong class="poll_card__vote_count_number_'.$postOptions->getPriorityString().'">'.$postOptions->getVotes().'</strong> votes</h5></div>
+                          </div>
+                          <div class="poll_card__product_name">'.$postOptions->getName().'</div>
+                          <div class="wd_spacerSize--5 d_spacerSize--5 wt_spacerSize--5 nt_spacerSize--5 p_spacerSize--5"></div>
+                          <div class="progress" style="height: 10px;">
+                            <div class="progress-bar progress-bar-success '.$postOptions->getPriorityString().'" id = "first_vote" role="progressbar" style="width:" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                          </div>
+                        </div>';
+                }
             }
+            
 
-            $html = '<div class="container" style="z-index:100" >
-            <div class="jumbotron shard" id = "first_vote">
-            <div class="row">
-            <a href="vote/'.$this->getId().'/'.$this->formatUrlString($this->getName()).'">
-            <div>
-              <h4>'.$this->getName().'</h4>
-
-                <div class="poll_card__author"><span>– </span>by
-                <a class="user__name" href="/profile/Nerdtality/polls"><strong>'.$this->getCreator().'</strong></a></div>
+            $html = '
+            <div class="item '.$this->active.'">
+                <div class="container">
+                    <div class="jumbotron shard" id = "'.$this->getPositionStr().'_vote">
+                        <div class="row">
+                            <div>
+                                <a href="vote/'.$this->getId().'/'.$this->formatUrlString($this->getName()).'"><h4>'.$this->getName().'</h4></a>           
+                                <div class="poll_card__author"><span>ï¿½ </span>by
+                                    <a class="user__name" href="/profile/Nerdtality/polls"><strong>'.$this->getCreator().'</strong></a>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-3">
+                                <div>
+                                    <img class = " img-responsive" alt="'.$this->getName().'" src="'.$this->getPostOptions()[0]->getPhoto().'" class="responsive poll_card__img">
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-9 col-md-9 col-sm-9">
+                                <div class="poll_card__options_heading"><h4>Options</h4></div>
+                                <div class="poll_card__votes">'
+                                    .$optionHTML.'
+                                    <button type="button" name="button">
+                                        <span class="poll_card__more_options_button button button--large link_button--primary">+1 Other Option</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-3">
-                <div><img class = " img-responsive" alt="'.$this->getName().'" src="'.$this->getPhoto().'" class="responsive poll_card__img">
-                <div ></div>
-                <div>
-                </div>
-                </div>
-                </div>
-                <div class="col-lg-9 col-md-9 col-sm-9">
-                <div class="poll_card__options_heading"><h4>Options</h4></div>
-                <div class="poll_card__votes">'.
-                $optionHTML.'
-                <button type="button" name="button"><span class="poll_card__more_options_button button button--large link_button--primary">+1 Other Option</span></button>
-                </div>
-                </div>
-                </a>
-                </div>
-                </div>
-                </div>';
+            </div>';
             echo $html;
         }
 
 
         #------------------Setter functions
+        function setActive(){
+            $this->active = "active";
+        }
+
         function setId($id){
             $this->id = $id;
         }
@@ -125,6 +137,13 @@
         function setDate($date){
             $this->date = $date;
         }
+        
+        function setPosition($pos){
+            $this->position = $pos;
+            if($pos == 1){
+                $this->setActive();
+            }
+        }
 
 
 
@@ -150,6 +169,45 @@
 
 
         }
+        function getPositionStr(){
+            switch($this->position){
+                case 0:
+                return "zero";
+                break;
+                case 1:
+                return "first";
+                break;
+                case 2:
+                return "second";
+                break;
+                case 3:
+                return "third";
+                break;
+                case 4:
+                return "fourth";
+                break;
+                case 5:
+                return "fifth";
+                break;
+                case 6:
+                return "sixth";
+                break;
+                case 7:
+                return "seventh";
+                break;
+                case 8:
+                return "eighth";
+                break;
+                case 9:
+                return "nineth";
+                break;
+                case 10:
+                return "tenth";
+                break;
+                default:
+                return $this->position."th";
+            }
+        }
 
         function sortItemsByVotes($a, $b){
             if ($a->getVotes() == $b->getVotes()){
@@ -160,6 +218,7 @@
 
         public function sortPostOptions($postOptions){
             #an algorithm that sorts post options according to their number of votes
+            /*
             $sortedOptions = Array();
             $votes = Array();
             $ids = Array();
@@ -176,6 +235,7 @@
             /*loop through the $votes array, get the post option object that matches with the current vote index
              * and add it to the $sortedOptions array at current index
              */
+            /*
             for ($x=0; $x<count($votes); $x++){
                 foreach ($postOptions as $option){
                     #match post option with its corresponding votes and check the integrity with the id
@@ -185,7 +245,7 @@
                     }
                 }
 
-            }
+            }*/
             # return the $sortedOptions array
             $sortedOptions = $postOptions;
             usort($sortedOptions, array($this,'sortItemsByVotes'));
@@ -205,11 +265,17 @@
                     #loop through all the option records read from the database
                     $option = new Option(); #create a new option object
                     # $option->setSortKey('key'.rand()); //has no need for now
+                    //$option->setPriority($x+1); dont set the priority here, set it after the options has been sorted
                     $option->setAllVars($records[$x]); #set all the properties of the option object with $records array
                     $options[$x]=$option; # add the option object to $options array
                 }
                 //var_dump($options);
                 $options = $this->sortPostOptions($options); #sort the post options
+                $sortedOptionsLength = count($options);
+                #since the options has now been sorted, we can now loop through the sorted options and set their priority
+                for($x=0; $x<$sortedOptionsLength; $x++){
+                    $options[$x]->setPriority($x+1); // loop through the options, get their respective position in the array and use it to set their priority
+                }
                 //var_dump($options);
                 return $options;
 
@@ -592,6 +658,7 @@
             $voted = FALSE;
             if (isset($_SESSION['username'])){
                 $voteRecords = $this->baseData->getMultipleRecords('votes','voter',$_SESSION['username']);
+                var_dump($voteRecords);
                 /* Check to see if $voteRecord is NULL or not, if it is NULL, that means that the has not voted in
                  * any item before, hence has no voting record in database
                  */
@@ -603,6 +670,7 @@
                         if ($voteRecord['option'] == $this->getId()){
                             #user has already voted this item
                             $voted = TRUE;
+                            var_dump($voteRecords);
                         }
                     }
                 }

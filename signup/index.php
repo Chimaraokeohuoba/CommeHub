@@ -62,15 +62,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
   if($inputOk){
     //echo "debug point";
-    $baseData = new Database("thehub"); //create a new instance of the database class
+    $baseData = new Database(database); //create a new instance of the database class
     #write the user information to the database
-    $baseData->insertUsers($username, $firstname, $lastname, $email, $mobile, $password, $photo_url);
+    $rank = 'odinary'; #holds the rank of the new user to be created
+    $baseData->insertUsers($username, $firstname, $lastname, $email, $mobile, $password, $photo_url, $rank);
     session_start();
     $_SESSION['logged'] = TRUE;
     $_SESSION['username'] = $baseData->getRecord(USERS,USERNAME,EMAIL,$email);
     $_SESSION['photo'] = $baseData->getRecord(USERS,PHOTO,EMAIL,$email);
     $_SESSION['email'] = $email;
-    header("Location:../dashboard.php");
+    header("Location:../home.php");
   }
 
 }

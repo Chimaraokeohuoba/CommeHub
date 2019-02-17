@@ -27,7 +27,8 @@ fieldset
       border: none;
       margin-bottom: 0;
 			
-		}
+    }
+
 
 .display{
   display: block;
@@ -35,6 +36,7 @@ fieldset
 .hide{
   display: none;
 }
+
 hr#testimonial_divider{
   height: 10px;
   /* background-color: 4px solid red; */

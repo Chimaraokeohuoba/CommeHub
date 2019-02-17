@@ -2,77 +2,110 @@
 
 require "../includes/datacontrol.php";
 
-if($_SERVER['REQUEST_METHOD']=='POST'){
-  echo br.br.br.br.br.br.br.br.br.br.br;
-  $baseData = new database('thehub');
-  //echo "submited sucessfully";
-  if (!empty($_FILES["post-image"]["name"])){
-    var_dump($_FILES["post-image"]);
-    echo "yes post image file is set";
-  $target_dir = "uploads/";
-  $target_file = $target_dir.basename($_FILES["post-image"]["name"]);
-  $uploadOk = 1;
-  $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-  //Lets check if what the user uploaded is an actual image file or a fake image file
-  $checkImageSize = getimagesize($_FILES['post-image']['tmp_name']);
-  if($checkImageSize != false){
-    // The file uploaded is a real image
-    echo "file is an image-".$checkImageSize['mime'];
-    $uploadOk = 1;
-  }else{
-    //The file uploaded is not really an image
-    $uploadOk = 0;
-  }
-  //check if the file already exists in the uploads folder
-  if(file_exists($target_file)){
-    //The file uploaded is already existing!
-    echo "file is already existing";
-    $uploadOk = 0;
-  }
-  if($imageFileType != 'jpg' && $imageFileType != 'png' && $imageFileType != 'jpeg' && $imageFileType != 'gif'){
-    //the file that the user uploaded doesn't have an accepted extension name
-    echo "<br>". $imageFileType. "<br>";
-    $uploadOk = 0;
-  }
-  if($uploadOk == 0){
-    // there was an error
-  }else{
-    if(move_uploaded_file($_FILES['post-image']['tmp_name'], $target_file)){
-      //file has been uploaded
-      $_SESSION['user'] = "Youngboss";
-      $hash = sha1($_SESSION['user']);
-      $_SESSION['new-post-id'] = $baseData->insertPosts($_POST['title'], 0, $_SESSION['user'], $target_file, $_POST['category'], $_POST['description'], $hash);
-      echo "file uploaded";
-    }
-  }
+if(!isset($_SESSION['user'])){
+  $_SESSION['requested-path'] = "../new_post";
+  $_SESSION['login-prompt-msg'] = "Please Login first to continue!";
+  header("Location:./login/login.php");
+  exit();
+}
 
-  }else if(isset($_POST['post_image_url'])){
-    $imageUrl = $_POST['post_image_url'];
-   #check if the image url is actually valid
-   $jpg = strchr($imageUrl, ".jpg");
-   $png = strchr($imageUrl, ".png");
-   $jpeg = strchr($imageUrl, ".jpeg");
-   $gif = strchr($imageUrl, ".gif");
-   if(!empty($jpg) || !empty($jpeg) || !empty($png) || !empty($gif)){
-     //if image url supplied is a valid image link
-     //perform database operations and insert data into database
-     $_SESSION['user'] = 'Youngboss';
-     $hash = sha1($_SESSION['user']);
-     $_SESSION['new-post-id'] = $baseData->insertPosts($_POST['title'], 0, $_SESSION['user'], $imageUrl, $_POST['category'], $_POST['description'], $hash);
-     echo "valid image link";
-   } else{
-     echo "invalid image link";
-   }
+if($_SERVER['REQUEST_METHOD']=='POST'){
+ echo br.br.br.br.br.br.br.br.br.br.br;
+  //var_dump($_POST["name"]);
+  //var_dump($_FILES["post-image"]);
+  $baseData = new database('thehub');
+  $totalProducts = count($_POST["name"]);
+  $post_id;
+  $post_success = false;
+  $error_message = null;
+  if (isset($_POST["title"])){ 
+    //check if the title of the post is set
+    $hash = sha1($_SESSION['user']);
+    $target_file = "target_file";
+    $post_id = $baseData->insertPosts($_POST['title'], 0, $_SESSION['user'], $target_file, $_POST['category'], $_POST['pd'], $hash);
+    $post_success = true;
+    //echo "post added";
+  }
+  if ($post_success == true && $post_id != null){
+    $product_success = false;
+    //add products
+    for ($x=0;$x<$totalProducts;$x++){
+      //iterate through all posted products
+      if (!empty($_FILES["post-image"]["name"][$x])){
+        //exeute this condition if the user is uploading a product image from his/her device and not by adding an external image url
+        $target_dir = "../uploads/";
+        $target_file = $target_dir.rand(1000,999999).basename($_FILES["post-image"]["name"][$x]);
+        $uploadOk = 1;
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        //Lets check if what the user uploaded is an actual image file or a fake image file
+        $checkImageSize = getimagesize($_FILES['post-image']['tmp_name'][$x]);
+        if($checkImageSize != false){
+          // The file uploaded is a real image
+          //echo "file is an image-".$checkImageSize['mime'];
+          $uploadOk = 1;
+        }else{
+          //The file uploaded is not really an image
+          $uploadOk = 0;
+          $error_message = $error_message."Image for product $x+1 is not a real image and the product record was not added \n";
+        }
+  
+        if(file_exists($target_file)){
+          //The file uploaded is already existing!
+         // echo "file is already existing";
+          $uploadOk = 0;
+          $error_message = $error_message."Image for product $x+1 already exists hence the product record was not added \n";
+        }
+  
+        if($imageFileType != 'jpg' && $imageFileType != 'png' && $imageFileType != 'jpeg' && $imageFileType != 'gif'){
+          //the file that the user uploaded doesn't have an accepted extension name
+          //echo "<br>". $imageFileType. "<br>";
+          $uploadOk = 0;
+          $error_message = $error_message."Image file type for product $x+1 is not accepted hence the product record was not added \n";
+        }
+        if($uploadOk == 0){
+          // there was an error uploading image
+          $error_message = $error_message."Ther was an error uploading image for product $x+1 hence the product record was not added \n";
+        }else{
+          var_dump($_FILES['post-image']['tmp_name'][$x]);
+          if(move_uploaded_file($_FILES['post-image']['tmp_name'][$x], $target_file)){
+            //file has been uploaded
+            $hash = sha1($_SESSION['user']);
+            $baseData->insertItems($_POST['name'][$x], 0, $_POST['price'][$x], $target_file, $_SESSION['user'], $_POST['category'], $_POST['title'], $_POST['description'][$x], $post_id);
+            $product_success = true;
+            //product record added successfull for products with uploaded images
+          }
+        }
+      }else if(isset($_POST['product_image_url'][$x])){
+        $imageUrl = $_POST['product_image_url'][$x];
+    
+       #check if the image url is actually valid
+       $jpg = strchr($imageUrl, ".jpg");
+       $png = strchr($imageUrl, ".png");
+       $jpeg = strchr($imageUrl, ".jpeg");
+       $gif = strchr($imageUrl, ".gif");
+       if(!empty($jpg) || !empty($jpeg) || !empty($png) || !empty($gif)){
+         //if image url supplied is a valid image link
+         //perform database operations and insert data into database
+         $baseData->insertItems($_POST['name'][$x], 0,$_POST['price'][$x], $imageUrl, $_SESSION['user'], $_POST['category'], $_POST['title'], $_POST['description'][$x], $post_id);
+         $product_success = true;
+         //product record successfull added for products with external image urls
+       }else{
+         //image link is not valid;
+         $error_message = $error_message . "Image Url added for product $x+1 is not valid thus the product recorded was not added \n";
+       }
+      }else{
+        //echo "fuck!"; #don't just mind the naughty word, I was kinda frustrated debugging this part :))
+        //also, dont mint this condition loop... 
+      }
+    }
+    if ($product_success){
+      header("Location: pingle/post-success.php");
+    }
+  }else{
+    //there was an error creating post
+    $error_message = "There was an error creating the Nomination, please try again";
   }
   
-
-  echo $_POST['category'];
-  echo '<br>';
-  echo $_POST['title'];
-  echo '<br>';
-  echo $_POST['description'];
-  echo '<br>';
-
 }
 
 
@@ -145,7 +178,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
         <div class="text-muted">Search before creating a cartegory as it may already be existing.</div>
         <hr>
       <div class="form-group">
-        <form name="add_post" id="add_post" method="post" action="new_post" enctype="multipart/form-data">
+        <form name="add_post" id="post_form" method="post" action="new_post" enctype="multipart/form-data">
         <div class="container">
           <ul class="nav nav-tabs">
           <li class="active"><a href="#">Post</a></li>
@@ -170,7 +203,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
                         <option value="flashlights">Flashlights</option>
                         <option value="hobby shop">Hobby Shop</option>
                         <option value="knitting">Knitting</option>
-                        <option value="massdrop hub">Massdrop Hub</option>
+                        <option value="commehub made">CommeHub Made</option>
                         <option value="mechanical keyboards">Mechanical Keyboards</option>
                         <option value="men's accessories">Men's Accessories</option>
                         <option value="men's apparel">Men's Apparel</option>
@@ -197,76 +230,24 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
               <label for="title">
                 <h4 class="text-muted">Post Description</h4>
               </label>
-              <textarea name="description" id="description" class="form-control" placeholder="A little description of your post here, not more than 100 words...."></textarea>
+              <textarea name="pd" id="description" class="form-control" placeholder="A little description of your post here, not more than 100 words...."></textarea>
               <br>
-              <label for="ex1">
-              <h4 class="text-muted">Choose an Image</h4>
-              </label><div class="row">
-              <div class="col-sm-4" id="post_image_url">
-              <input class="form-control" name="post_image_url" id="ex1" type="text" placeholder="Paste Image url here">
-              </div>
-              <div class="col-sm-2" id="upload_post_image_box">
-              <button type="button" class="btn btn-primary btn-md" id="upload_post_image_button">Or click here to Upload</button>
-              </div>
-              <div class="col-sm-3 hide" id="image_input_box">
-              <input type="file" name="post-image" id="post-image" placeholder="Choose image here">
-              </div>
+              <div id="product_box">
               </div>
             </div><br>
-            <input type="submit" name="submit" class="btn btn-success btn-lg" value="Add Options">
-            <hr><hr>
+            <button type="button" id="add_product" class="btn btn-success ">Add Product</button>
             
+            <hr><hr>
+            <div class="">
+            <input type="submit" value="Create Nomination" id="submit_post" class="btn btn-success btn-lg disabled">
+            <span id="submit-hint" class="text-muted"></span>
+          </div>
             </div>
             </form>
 
             <!-- </li> -->
           <!-- </ul> -->
-          <div>
-              <div class="">
-              <fieldset class="col-md-6">    	
-					<legend><h4 class="text-muted">Option1</h4></legend>
-					
-          <label for="title">
-              <h4 class="text-muted">Option title</h4>
-              </label>
-              <input type="text" name="title" id="title" class="form-control"  placeholder="option title here..." required>
-              <br>
-              <label for="title">
-                <h4 class="text-muted">Post Description</h4>
-              </label>
-              <textarea name="description" id="description" class="form-control" placeholder="A little description of your post here, not more than 100 words...."></textarea>
-              <br>
-              <label for="ex1">
-              <h4 class="text-muted">Choose an Image</h4>
-              </label><div class="row">
-              <div class="col-sm-4" id="post_image_url">
-              <input class="form-control" id="ex1" type="text" placeholder="Paste Image url here">
-              </div>
-              <div class="col-sm-2" id="upload_post_image_box">
-              <button type="button" class="btn btn-primary btn-md" id="upload_post_image_button">Or click here to Upload</button>
-              </div>
-              <div class="col-sm-3 hide" id="image_input_box">
-              <input type="file" name="post-image" id="post-image" placeholder="Choose image here">
-              </div>
-              </div>
-							<p></p>
-					
-					
-				</fieldset>				
-				
-				<div class="clearfix"></div>
-                  <div class="">
-                    <button type="button" class="btn btn-default btn-lg">Add an option</button>
-                  </div>
-                </div>
-              </div>
-            </div>
             <hr>
-
-          <div class="">
-            <button type="button" class="btn btn-success disabled">Create</button>
-            <span class="text-muted">You must add atleast 3 Options to continue</span>
-          </div>
 
           </div>
       </div>
@@ -275,6 +256,8 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 
         <br>
         <br>
+        <!--submitted post ui-->
+        <div class="modal-bg" id="modal-bg"></div>
 
 
           <footer>
@@ -346,6 +329,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
     <script src="transparent_to_solid_navbar.js"></script>
     <script src="animated_arrow.js"></script>
     <script src="back_to_top.js"></script>
+    <script src="./pingle/js/new_product.js"></script>
 
 
 

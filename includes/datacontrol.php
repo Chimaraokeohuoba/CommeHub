@@ -15,6 +15,7 @@ define('LASTNAME', 'lasttname');
 define('EMAIL', 'email');
 define('PASSWORD', 'password');
 define('PHOTO', 'photo_url');
+define('database', 'thehub');
 define('br','<br>');
 
 session_start();
@@ -78,8 +79,9 @@ class database{
 
 
     #--------DATABASE data input functions
-    function insertUsers($username, $firstname, $lastname, $email, $mobile, $password, $photo_url,$rank){
+    function insertUsers($username, $firstname, $lastname, $email, $mobile, $password, $photo_url, $rank){
         #this function inserts a row of data into the users table in the database
+        //$status = "online";
         $sql="INSERT INTO users (username, firstname, lastname, email, mobile, password, photo_url, rank)
         VALUES(?,?,?,?,?,?,?,?)" ;
         $stmt = $this->conn->prepare($sql);
@@ -100,12 +102,15 @@ class database{
 
     }
 
-    function insertItems($name, $votes, $photo_url, $creator, $category, $item_group){
+    function insertItems($name, $votes, $price, $photo_url, $creator, $category, $item_group, $description, $foreign_key){
         #this function inserts a row of data into the users table in the database
-        $sql="INSERT INTO items (name, votes, photo_url, creator, category, item_group)
-        VALUES('$name', '$votes', '$photo_url', '$creator', '$category', '$item_group')" ;
+        $category = str_replace("'","\'", $category);
+        $description = str_replace("'","\'", $description);
+        $item_group = str_replace("'","\'", $item_group);
+        $name = str_replace("'","\'", $name);
+        $sql="INSERT INTO items (name, votes, price, photo_url, creator, category, item_group, description, foreign_key)
+        VALUES('$name', '$votes', '$price', '$photo_url', '$creator', '$category', '$item_group', '$description', '$foreign_key')" ;
         if($this->conn->query($sql)){
-            echo "success";
             return TRUE;
         }else{
             echo $this->conn->error;
@@ -116,8 +121,10 @@ class database{
 
     function insertPosts($name, $votes, $creator, $photo_url, $category, $description, $hash){
         #this function inserts a row of data into the users table in the database
+        $category = str_replace("'","\'", $category);
+        $description = str_replace("'","\'", $description);
         $sql="INSERT INTO posts (name, votes, creator, photo_url, category, description, hash)
-        VALUES('$name', '$votes', '$creator', '$photo_url', '$category', '$description', '$hash')" ;
+        VALUES('$name','$votes','$creator','$photo_url','$category','$description','$hash')" ;
         if($this->conn->query($sql)){
             return $this->conn->insert_id;
         }else{
@@ -214,6 +221,24 @@ class database{
 
     }
 
+    function getLimitedTableRecords($table, $limit){
+        $records = Array();
+        $count = 0;
+        $sql = "SELECT * FROM $table LIMIT $limit";
+        $result = $this->conn->query($sql);
+        if ($result->num_rows > 0){
+            while($row = $result->fetch_assoc()){
+                $records[$count] = $row;
+                $count++;
+            }
+            return $records;
+
+        }else {
+            return NULL;
+        }
+
+    }
+
     function deleteRecord($table, $whereArg, $whereClause){
         $sql = "DELETE FROM $table WHERE $whereArg='$whereClause'";
         if($this->conn->query($sql) == TRUE){
@@ -273,7 +298,7 @@ class database{
 }
 
 
-$baseData = new database("db3");
+//$baseData = new database("db3");
 //$baseData->insertUsers("Youngboss", "Chima", "Jerry", "contact@chimaraokeohuoba.me", "2348108529112","ha1i3kwsn3290", "uploads/db3.png", "5");
 //$baseData->insertPosts("Hello world", "0", "Youngboss", "uploads/db3.png", "Testing", "hello world description", "144CADD34F");
 

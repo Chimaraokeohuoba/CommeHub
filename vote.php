@@ -11,7 +11,7 @@ if (isset($_GET['id']) && isset($_GET['hash'])){
     $hash = $_GET['hash'];
 
     if (!empty($hash) && !empty($id)){
-        $post = posts::getPostById($id);
+        $post = posts::getPostById($id); //get a post with its ID
     }
 
     if (isset($_GET['vote'])&&isset($_GET['option'])){
@@ -19,16 +19,16 @@ if (isset($_GET['id']) && isset($_GET['hash'])){
         $voteId = $_GET['vote'];
         $voteOption = $_GET['option'];
         #check if the user is actually logged in
-        if (isset($_SESSION['username'])){
+        if (isset($_SESSION['user'])){
             #check the integrity of the link before proceeding with the voting
             //var_dump($post);
             if ($post->getPostOptions()[--$voteOption]->getId() == $voteId){
-                $voteRecords = $baseData->getMultipleRecords('votes','voter',$_SESSION['username']);
+                $voteRecords = $baseData->getMultipleRecords('votes','voter',$_SESSION['user']);
                 $alreadyVoted = FALSE;
                 /* Check to see if $voteRecord is NULL or not, if it is NULL, that means that the has not voted in
                  * any item before, hence has no voting record in database
                  */
-                //var_dump($voteRecords);
+                var_dump($voteRecords);
                 if ($voteRecords != NULL){
                     #echo 'not null debug point';
                     foreach ($voteRecords as $voteRecord){
@@ -57,7 +57,9 @@ if (isset($_GET['id']) && isset($_GET['hash'])){
             }
 
         }else {
-            echo "please log in first to vote";
+            $_SESSION['login-prompt-msg'] = "Please Login first to vote this item";
+            $_SESSION['requested-path'] = '../vote/'.$id.'/'.$post->formatUrlString($post->getName());
+            header("Location:./login/login.php");
         }
     }
 

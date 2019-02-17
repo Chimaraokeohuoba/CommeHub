@@ -5,4 +5,4 @@ RewriteEngine on
 RewriteRule ^vote/([0-9a-zA-Z]+)/([0-9a-zA-Z]+) vote.php?id=$1&hash=$2 [NC,L]
 RewriteRule ^vote/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+)/([0-9a-zA-Z]+) vote.php?id=$1&hash=$2&vote=$3&option=$4 [NC,L]
 RewriteRule ^new_post pingle/new_vote_cartegory.php [NC,L]
-RewriteRule  coming/image.html [NC,L]
+#RewriteRule ^home home.php [NC,L]
